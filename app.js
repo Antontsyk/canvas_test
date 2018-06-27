@@ -24,7 +24,6 @@ Shape.prototype.contains = function(mx, my) {
 
 function CanvasState(canvas) {
     // **** First some setup! ****
-
     this.canvas = canvas;
     this.width = canvas.width;
     this.height = canvas.height;
@@ -51,6 +50,7 @@ function CanvasState(canvas) {
     this.selection = null;
     this.dragoffx = 0;
     this.dragoffy = 0;
+    this.startPosition = null;
 
     var myState = this;
 
@@ -70,6 +70,7 @@ function CanvasState(canvas) {
                 // so we can move it smoothly (see mousemove)
                 myState.dragoffx = mx - mySel.x;
                 myState.dragoffy = my - mySel.y;
+                myState.startPosition = { x: mySel.x, y: mySel.y };
                 myState.dragging = true;
                 myState.selection = mySel;
                 myState.valid = false;
@@ -87,11 +88,9 @@ function CanvasState(canvas) {
         if (myState.dragging){
 
             var mouse = myState.getMouse(e);
-            console.log(myState);
 
             var r = ( mouse.x + myState.selection.w - myState.dragoffx <= myState.width);
             var b = ( mouse.y + myState.selection.h - myState.dragoffy <= myState.height);
-            console.log(r, b)
             // We don't want to drag the object by its top-left corner, we want to drag it
             // from where we clicked. Thats why we saved the offset and use it here
             myState.selection.fill = '#AAAAAA';
@@ -115,21 +114,21 @@ function CanvasState(canvas) {
                 myState.selection.y = mouse.y - myState.dragoffy;
             }
 
-            myState.shapes.map(function ( elem, i ) {
-                if( elem.id != myState.selection.id ){
-                    if( myState.selection.x + myState.selection.w > elem.x && myState.selection.x < elem.x + elem.w && myState.selection.y + myState.selection.h > elem.y && myState.selection.y < elem.y + elem.h ){
-                        myState.selection.fill = 'orange';
-                        elem.fill = 'orange';
-                    }else{
-                        elem.fill = '#AAAAAA';
-                    }
-                }
-            })
+            myState.overlap(myState);
 
             myState.valid = false; // Something's dragging so we must redraw
         }
     }, true);
     canvas.addEventListener('mouseup', function(e) {
+        if(myState.overlap(myState)){
+            myState.selection.x = myState.startPosition.x;
+            myState.selection.y = myState.startPosition.y;
+            myState.shapes.map(function (el) {
+               el.fill = '#AAAAAA';
+            });
+            myState.valid = false;
+        };
+        myState.draw();
         myState.dragging = false;
     }, true);
     // double click for making new shapes
@@ -156,6 +155,53 @@ CanvasState.prototype.clear = function() {
     this.ctx.clearRect(0, 0, this.width, this.height);
 }
 
+CanvasState.prototype.overlap = function( myState ) {
+    var over = false;
+    var megerSpace = 20;
+    if( myState.selection ){
+        var X = myState.selection.x,
+            Y = myState.selection.y,
+            W = myState.selection.w,
+            H = myState.selection.h;
+
+        console
+
+        myState.shapes.map(function ( elem, i ) {
+            console.log(X - elem.x + elem.w , Math.abs(Y - elem.y ))
+            if( elem.id != myState.selection.id ){
+                if( X + W > elem.x &&
+                    X < elem.x + elem.w &&
+                    Y + H > elem.y &&
+                    Y < elem.y + elem.h ){
+                    myState.selection.fill = 'orange';
+                    elem.fill = 'orange';
+                    over = true;
+                }else if( elem.x - (X + W) <= megerSpace && elem.x - (X + W) >= 0 && Math.abs(Y - elem.y ) <= megerSpace ){
+                    myState.selection.x = elem.x - W;
+                    myState.selection.y = elem.y;
+                    console.log('to right');
+                    myState.draw();
+                }else if( (X - ( elem.x + elem.w )) <= megerSpace && (X - ( elem.x + elem.w )) >= 0 && Math.abs(Y - elem.y ) <= megerSpace ){
+                    myState.selection.x = elem.x + elem.w;
+                    myState.selection.y = elem.y;
+                    console.log('to left');
+                }else if( elem.y - ( Y + H ) <= megerSpace && elem.y - ( Y + H ) >= 0 && Math.abs( X - elem.x ) <= megerSpace ){
+                    myState.selection.x = elem.x;
+                    myState.selection.y = elem.y - H;
+                    console.log('to bottom');
+                }else if( Y - ( elem.y + elem.h ) <= megerSpace && Y - ( elem.y + elem.h ) >= 0 && Math.abs( X - elem.x ) <= megerSpace ){
+                    myState.selection.x = elem.x;
+                    myState.selection.y = elem.y + elem.h;
+                    console.log('to bottom');
+                }else{
+                    elem.fill = '#AAAAAA';
+                }
+            }
+        });
+
+    }
+    return over;
+}
 // While draw is called as often as the INTERVAL variable demands,
 // It only ever does something if the canvas gets invalidated by our code
 CanvasState.prototype.draw = function() {
@@ -221,7 +267,6 @@ function init() {
     function resizeCanvas() {
         canvas.width = window.innerWidth - 80;
         canvas.height = window.innerHeight - 80;
-        console.log( window.innerWidth, window.innerHeight );
         drawStuff();
     };
 
@@ -229,9 +274,10 @@ function init() {
 
     function drawStuff(){
         s = new CanvasState(canvas);
-        s.addShape(new Shape(100,100,220,150));
-        s.addShape(new Shape(100,300,200,150));
-        s.addShape(new Shape(100,500,160,130));
+        s.addShape(new Shape(100,100,200,150));
+        s.addShape(new Shape(100,300,300,150));
+        s.addShape(new Shape(100,500,160,150));
+        s.addShape(new Shape(100,700,340,150));
     }
 }
 init()
