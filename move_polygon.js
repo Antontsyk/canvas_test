@@ -38,20 +38,48 @@ window.onload = function () {
                 return way;
             }
 
-            var positions = [];
+            function crossElem( elem ) {
+                for (  var i = 0; i < poligonosRy.length; i++ ) {
+                    poligonosRy[ i ].color = '#FF9500';
+                    if ( poligonosRy[i].id == elem.id ) {
+                        continue;
+                    } else {
+                        for ( var j = 0; j < poligonosRy[i].way.length; j++ ) {
+                            for ( var k = 0; k < elem.way.length; k++ ) {
+                                var lk = k+1;
+                                var lj = j+1;
+                                if( lk >= elem.way.length  ) { lk = 0 }
+                                if( lj >= poligonosRy[i].way.length  ) { lj = 0 }
+                                var l1 = [elem.way[ k ], elem.way[ lk ]];
+                                var l2 = [poligonosRy[ i ].way[ j ], poligonosRy[ i ].way[ lj] ];
+
+                                if( crossLine( l1, l2 ) ){
+                                    poligonosRy[ i ].color = 'red';
+                                    poligonosRy[ elem.id ].color = 'red';
+                                    console.log(true);
+                                    return;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
 
             function dibujarPoligonos() {
                 for (var i = 0; i < poligonosRy.length; i++) {
-                    positions.push(dibujarUnPoligono(poligonosRy[i].X, poligonosRy[i].Y, poligonosRy[i].R, poligonosRy[i].L, poligonosRy[i].paso, poligonosRy[i].color));
+                    poligonosRy[i].id = i;
+                    poligonosRy[i].way = dibujarUnPoligono(poligonosRy[i].X, poligonosRy[i].Y, poligonosRy[i].R, poligonosRy[i].L, poligonosRy[i].paso, poligonosRy[i].color);
                 }
             }
 
             var poligonosRy = [
-                {'X': 250, 'Y': 230, 'R': 85, 'L': 10, 'paso': 1, 'color': '#4CD964', 'bool': false},
-                {'X': 110, 'Y': 80, 'R': 70, 'L': 5, 'paso': 0.4, 'color': '#FF9500', 'bool': false},
-                {'X': 340, 'Y': 90, 'R': 80, 'L': 5, 'paso': 2, 'color': '#FF3B30', 'bool': false},
-                {'X': 100, 'Y': 260, 'R': 65, 'L': 9, 'paso': 2, 'color': '#CC73E1', 'bool': false},
-                {'X': 400, 'Y': 270, 'R': 75, 'L': 8, 'paso': 3, 'color': '#1BADF8', 'bool': false}
+                {'X': 150, 'Y': 100, 'R': 85, 'L': 10, 'paso': 1, 'color': '#FF9500', 'bool': false},
+                {'X': 110, 'Y': 200, 'R': 70, 'L': 5, 'paso': 0.4, 'color': '#FF9500', 'bool': false},
+                {'X': 140, 'Y': 390, 'R': 80, 'L': 5, 'paso': 1, 'color': '#FF9500', 'bool': false},
+                {'X': 100, 'Y': 560, 'R': 65, 'L': 9, 'paso': 2, 'color': '#FF9500', 'bool': false},
+                {'X': 100, 'Y': 770, 'R': 75, 'L': 3, 'paso': 1, 'color': '#FF9500', 'bool': false}
             ];
             poligonosRy.sort(function (a, b) {
                 return b.R - a.R
@@ -85,11 +113,12 @@ window.onload = function () {
                     var mousePos = oMousePos(canvas, evt);
                     for (var i = 0; i < poligonosRy.length; i++) {
                         if (poligonosRy[i].bool) {
-                            console.log( crossLine( positions[i], positions[0] ) )
+                            crossElem(poligonosRy[i]);
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             X = mousePos.x + delta.x, Y = mousePos.y + delta.y
                             poligonosRy[i].X = X;
                             poligonosRy[i].Y = Y;
+                            crossElem(poligonosRy[i]);
                             break;
                         }
                     }
@@ -118,21 +147,26 @@ window.onload = function () {
     }
 }
 
-function crossLine(l1,l2) {
-    var dx1 = l1[1][0] - l1[0][0],
-        dy1 = l1[1][1] - l1[0][1],
-        dx2 = l2[1][0] - l2[0][0],
-        dy2 = l2[1][1] - l2[0][1],
-        x = dy1 * dx2 - dy2 * dx1;
 
-    if(!x, !dx2) {
-        return false;
-    }
 
-    var y = l2[0][0] * l2[1][1] - l2[0][1] * l2[1][0];
-    x = ((l1[0][0] * l1[1][1] - l1[0][1] * l1[1][0]) * dx2 - y * dx1) / x;
-    y = (dy2 * x - y) / dx2;
 
-    return ((l1[0][0] <= x && l1[1][0] >= x) || (l1[1][0] <= x && l1[0][0] >= x)) &&
-        ((l2[0][0] <= x && l2[1][0] >= x) || (l2[1][0] <= x && l2[0][0] >= x));
+
+function crossLine( l1, l2 ) {
+
+            var dx1 = l1[1][0] - l1[0][0],
+                dy1 = l1[1][1] - l1[0][1],
+                dx2 = l2[1][0] - l2[0][0],
+                dy2 = l2[1][1] - l2[0][1],
+                x = dy1 * dx2 - dy2 * dx1;
+
+            if(!x, !dx2) {
+                return false;
+            }
+
+            var y = l2[0][0] * l2[1][1] - l2[0][1] * l2[1][0];
+            x = ((l1[0][0] * l1[1][1] - l1[0][1] * l1[1][0]) * dx2 - y * dx1) / x;
+            y = (dy2 * x - y) / dx2;
+
+            return ((l1[0][0] <= x && l1[1][0] >= x) || (l1[1][0] <= x && l1[0][0] >= x)) &&
+                ((l2[0][0] <= x && l2[1][0] >= x) || (l2[1][0] <= x && l2[0][0] >= x));
 }
