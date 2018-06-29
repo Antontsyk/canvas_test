@@ -56,15 +56,17 @@ window.onload = function () {
                                 if( crossLine( l1, l2 ) ){
                                     poligonosRy[ i ].color = 'red';
                                     poligonosRy[ elem.id ].color = 'red';
-                                    console.log(true);
-                                    return;
+                                    poligonosRy[ elem.id ].returnValue = true;
+                                    return true;
                                     break;
+                                }else{
+                                    poligonosRy[ elem.id ].returnValue = false;
                                 }
                             }
                         }
-
                     }
                 }
+                return false;
             }
 
             function dibujarPoligonos() {
@@ -73,13 +75,13 @@ window.onload = function () {
                     poligonosRy[i].way = dibujarUnPoligono(poligonosRy[i].X, poligonosRy[i].Y, poligonosRy[i].R, poligonosRy[i].L, poligonosRy[i].paso, poligonosRy[i].color);
                 }
             }
-
+            var moveElem;
             var poligonosRy = [
                 {'X': 150, 'Y': 100, 'R': 85, 'L': 10, 'paso': 1, 'color': '#FF9500', 'bool': false},
-                {'X': 110, 'Y': 200, 'R': 70, 'L': 5, 'paso': 0.4, 'color': '#FF9500', 'bool': false},
-                {'X': 140, 'Y': 390, 'R': 80, 'L': 5, 'paso': 1, 'color': '#FF9500', 'bool': false},
+                {'X': 110, 'Y': 200, 'R': 70, 'L': 5, 'paso': 0.4, 'color': '#FF9500', 'bool': false}
+                /*{'X': 140, 'Y': 390, 'R': 80, 'L': 5, 'paso': 1, 'color': '#FF9500', 'bool': false},
                 {'X': 100, 'Y': 560, 'R': 65, 'L': 9, 'paso': 2, 'color': '#FF9500', 'bool': false},
-                {'X': 100, 'Y': 770, 'R': 75, 'L': 3, 'paso': 1, 'color': '#FF9500', 'bool': false}
+                {'X': 100, 'Y': 770, 'R': 75, 'L': 3, 'paso': 1, 'color': '#FF9500', 'bool': false}*/
             ];
             poligonosRy.sort(function (a, b) {
                 return b.R - a.R
@@ -91,11 +93,13 @@ window.onload = function () {
             canvas.addEventListener('mousedown', function (evt) {
                 isDragging = true;
                 var mousePos = oMousePos(canvas, evt);
-                for (var i = 0; i < poligonosRy.length; i++) {
+                for (var i = poligonosRy.length -1; i >=0; i--) {
 //dibujarUnPoligono(X,Y,R,L,paso,color)   
                     dibujarUnPoligono(poligonosRy[i].X, poligonosRy[i].Y, poligonosRy[i].R, poligonosRy[i].L, poligonosRy[i].paso, poligonosRy[i].color);
                     if (ctx.isPointInPath(mousePos.x, mousePos.y)) {
                         poligonosRy[i].bool = true;
+                        poligonosRy[i].savePos = { x: poligonosRy[i].X, y: poligonosRy[i].Y }
+                        console.log(poligonosRy[i]);
                         delta.x = poligonosRy[i].X - mousePos.x;
                         delta.y = poligonosRy[i].Y - mousePos.y;
                         break;
@@ -129,6 +133,13 @@ window.onload = function () {
             canvas.addEventListener('mouseup', function (evt) {
                 isDragging = false;
                 for (var i = 0; i < poligonosRy.length; i++) {
+                    if( poligonosRy[i].returnValue ){
+                        poligonosRy[i].X = poligonosRy[i].savePos.x;
+                        poligonosRy[i].Y = poligonosRy[i].savePos.y;
+                        poligonosRy[i].color = '#FF9500';
+                        poligonosRy[i].returnValue = false;
+                    }
+                    poligonosRy[i].color = '#FF9500';
                     poligonosRy[i].bool = false
                 }
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -159,7 +170,7 @@ function crossLine( l1, l2 ) {
                 dy2 = l2[1][1] - l2[0][1],
                 x = dy1 * dx2 - dy2 * dx1;
 
-            if(!x, !dx2) {
+            if( !x || !dx2 || !dx1|| !dy1|| !dy2) {
                 return false;
             }
 
