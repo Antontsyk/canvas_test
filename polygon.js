@@ -62,15 +62,20 @@ function CanvasState(canvas) {
 
             paths.forEach( function(path, index) {
                 if ( myState.ctx.isPointInPath(path, mx, my)) {
-                    var pol = myState.polygons[ index ];
-                    myState.dragoffx = -mx;
-                    myState.dragoffy = -my;
 
-                    myState.dragging = true;
-                    myState.selection = pol;
-                    myState.startPosition = { way: [].concat(pol.way) };
-                    console.log(myState.startPosition.way[0])
-                    myState.valid = false;
+                    for (var i = l-1; i >= 0; i--) {
+                        if( i == index ){
+                            var pol = myState.polygons[ i ];
+                            myState.dragoffx = -mx;
+                            myState.dragoffy = -my;
+
+                            myState.dragging = true;
+                            myState.selection = pol;
+                            myState.startPosition = pol.way;
+
+                            myState.valid = false;
+                        }
+                    }
 
                     return;
                 }
@@ -87,7 +92,7 @@ function CanvasState(canvas) {
         if (myState.dragging){
             var mouse = myState.getMouse(e);
 
-
+            console.log( myState.startPosition[0][0] )
             for( var i = 0; i < myState.selection.way.length; i++ ){
                 myState.selection.way[i][0] += myState.dragoffx + mouse.x;
                 myState.selection.way[i][1] += myState.dragoffy + mouse.y;
@@ -97,7 +102,6 @@ function CanvasState(canvas) {
 
             var cross = crossElem( myState.selection, myState.polygons );
 
-            console.log(myState.startPosition.way[0])
             if( cross.resp ){
                 myState.selection.fill = 'red'
                 myState.polygons[ cross.indexCross ].fill = 'red'
@@ -115,7 +119,7 @@ function CanvasState(canvas) {
     }, true);
     canvas.addEventListener('mouseup', function(e) {
         if( myState.returnValue ){
-            console.log(myState.startPosition)
+            console.log(myState.startPosition())
             myState.selection.way = myState.selection.startPosition;
             myState.selection.returnValue = false;
             myState.valid = false;
@@ -241,7 +245,7 @@ var polygonsInit = [
             [80,250],
             [40,300]
         ],
-        fill: 'black'
+        fill: 'green'
     }
 ]
 
