@@ -58,28 +58,24 @@ function CanvasState(canvas) {
         var my = mouse.y;
         var polygons = myState.polygons;
         var l = polygons.length;
-        myState.ctx.globalAlpha = 0.7;
 
-            paths.forEach( function(path, index) {
-                if ( myState.ctx.isPointInPath(path, mx, my)) {
+        for( var i = 0; i < paths.length; i++ ){
+            var path = paths[i];
+            if ( myState.ctx.isPointInPath(path, mx, my)) {
+                var pol = myState.polygons[ i ];
+                myState.dragoffx = -mx;
+                myState.dragoffy = -my;
 
-                    for (var i = l-1; i >= 0; i--) {
-                        if( i == index ){
-                            var pol = myState.polygons[ i ];
-                            myState.dragoffx = -mx;
-                            myState.dragoffy = -my;
+                myState.dragging = true;
+                myState.selection = pol;
+                myState.startPosition = pol.way;
 
-                            myState.dragging = true;
-                            myState.selection = pol;
-                            myState.startPosition = pol.way;
 
-                            myState.valid = false;
-                        }
-                    }
-
-                    return;
-                }
-            });
+                myState.valid = false;
+                break;
+                return;
+            }
+        }
 
         // havent returned means we have failed to select anything.
         // If there was an object selected, we deselect it
@@ -92,7 +88,6 @@ function CanvasState(canvas) {
         if (myState.dragging){
             var mouse = myState.getMouse(e);
 
-            console.log( myState.startPosition[0][0] )
             for( var i = 0; i < myState.selection.way.length; i++ ){
                 myState.selection.way[i][0] += myState.dragoffx + mouse.x;
                 myState.selection.way[i][1] += myState.dragoffy + mouse.y;
@@ -105,9 +100,9 @@ function CanvasState(canvas) {
             if( cross.resp ){
                 myState.selection.fill = 'red'
                 myState.polygons[ cross.indexCross ].fill = 'red'
-                myState.selection.returnValue = true;
+                myState.returnValue = true;
             } else{
-                myState.selection.returnValue = false;
+                myState.returnValue = false;
                 myState.polygons.map( function ( elem, i ) {
                     elem.fill = polygonsInit[i].fill;
                 });
@@ -118,9 +113,10 @@ function CanvasState(canvas) {
         }
     }, true);
     canvas.addEventListener('mouseup', function(e) {
+        console.log(myState.returnValue)
         if( myState.returnValue ){
-            console.log(myState.startPosition())
-            myState.selection.way = myState.selection.startPosition;
+            console.log(myState.startPosition)
+            myState.selection.way = myState.startPosition;
             myState.selection.returnValue = false;
             myState.valid = false;
         };
