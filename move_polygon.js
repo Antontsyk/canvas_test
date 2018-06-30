@@ -77,11 +77,11 @@ window.onload = function () {
             }
             var moveElem;
             var poligonosRy = [
-                {'X': 150, 'Y': 100, 'R': 85, 'L': 10, 'paso': 1, 'color': '#FF9500', 'bool': false},
-                {'X': 110, 'Y': 200, 'R': 70, 'L': 5, 'paso': 0.4, 'color': '#FF9500', 'bool': false}
-                /*{'X': 140, 'Y': 390, 'R': 80, 'L': 5, 'paso': 1, 'color': '#FF9500', 'bool': false},
+                /*{'X': 150, 'Y': 100, 'R': 85, 'L': 10, 'paso': 1, 'color': '#FF9500', 'bool': false},
+                {'X': 110, 'Y': 200, 'R': 70, 'L': 5, 'paso': 0.4, 'color': '#FF9500', 'bool': false}*/
+                /*{'X': 140, 'Y': 390, 'R': 80, 'L': 5, 'paso': 1, 'color': '#FF9500', 'bool': false},*/
                 {'X': 100, 'Y': 560, 'R': 65, 'L': 9, 'paso': 2, 'color': '#FF9500', 'bool': false},
-                {'X': 100, 'Y': 770, 'R': 75, 'L': 3, 'paso': 1, 'color': '#FF9500', 'bool': false}*/
+                {'X': 100, 'Y': 770, 'R': 75, 'L': 3, 'paso': 1, 'color': '#FF9500', 'bool': false}
             ];
             poligonosRy.sort(function (a, b) {
                 return b.R - a.R
