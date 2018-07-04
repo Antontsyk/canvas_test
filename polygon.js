@@ -218,6 +218,7 @@ function init(polygonsInit) {
     var polygonsInit = polygonsInit;
 
     function drawStuff(){
+        countElem = 0;
         s = new CanvasState(canvas);
         if( polygonsInit.length ){
             for ( var i = 0; i < polygonsInit.length; i++ ) {
@@ -226,8 +227,6 @@ function init(polygonsInit) {
         }
     }
 }
-
-
 
 var polygonsInit = [
     {
@@ -259,8 +258,6 @@ var polygonsInit = [
         fill: 'green'
     }
 ]
-
-
 
 init( polygonsInit )
 ////////////////////////////////////////////////
