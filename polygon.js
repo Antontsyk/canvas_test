@@ -93,12 +93,22 @@ function CanvasState(canvas) {
         if (myState.dragging){
             var mouse = myState.getMouse(e);
 
+            var newWay = new Array();
+
             for( var i = 0; i < myState.selection.way.length; i++ ){
-                myState.selection.way[i][0] += myState.dragoffx + mouse.x;
-                myState.selection.way[i][1] += myState.dragoffy + mouse.y;
+                newWay[i] = new Array();
+                newWay[i][0] = myState.selection.way[i][0] + myState.dragoffx + mouse.x;
+                newWay[i][1] = myState.selection.way[i][1] + myState.dragoffy + mouse.y;
             }
-            myState.dragoffx = -mouse.x;
-            myState.dragoffy = -mouse.y;
+
+            if(!myState.isEnd(newWay)){
+                myState.selection.way = newWay;
+
+                myState.dragoffx = -mouse.x;
+                myState.dragoffy = -mouse.y;
+            } else {
+                return;
+            }
 
             var cross = crossElem( myState.selection, myState.polygons );
 
@@ -112,8 +122,6 @@ function CanvasState(canvas) {
                     elem.fill = polygonsInit[i].fill;
                 });
             }
-
-            console.log( myState.startPosition )
             myState.valid = false; // Something's dragging so we must redraw
         }
     }, true);
@@ -122,7 +130,7 @@ function CanvasState(canvas) {
         if( myState.returnValue ){
             console.log( myState.startPosition )
             myState.selection.way = myState.startPosition;
-            myState.selection.returnValue = false;
+            myState.returnValue = false;
             myState.polygons.map( function ( elem, i ) {
                 elem.fill = polygonsInit[i].fill;
             });
@@ -134,8 +142,10 @@ function CanvasState(canvas) {
 
     this.selectionColor = '#CC0000';
     this.selectionWidth = 2;
-    this.interval = 30;
-    setInterval(function() { myState.draw(); }, myState.interval);
+    this.interval = 33;
+    //setInterval(function() { myState.draw(); }, myState.interval);
+
+    window.requestAnimationFrame( myState.draw.bind(this) )
 }
 
 CanvasState.prototype.addPolygon = function(polygon) {
@@ -174,6 +184,7 @@ CanvasState.prototype.draw = function() {
 
         this.valid = true;
     }
+    window.requestAnimationFrame( this.draw.bind( this ) )
 }
 
 CanvasState.prototype.getMouse = function(e) {
@@ -185,8 +196,8 @@ CanvasState.prototype.getMouse = function(e) {
     };
 }
 
-CanvasState.prototype.isEnd = function () {
-    var way = this.selection.way;
+CanvasState.prototype.isEnd = function (newWay) {
+    var way = newWay;
     for ( var i = 0; i < this.selection.way.length; i++ ){
         if( way[i][0] <= 0 || way[i][0] >= this.width || way[i][1] < 0 || way[i][1] > this.height ){
             return true
