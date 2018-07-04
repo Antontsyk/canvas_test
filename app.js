@@ -128,6 +128,9 @@ function CanvasState(canvas) {
             });
             myState.valid = false;
         };
+        /*for( var i = 0; myState.shapes.length; i++ ){
+            myState.shapes[i].fill = '#AAAAAA';
+        }*/
         myState.draw();
         myState.dragging = false;
     }, true);
@@ -180,7 +183,6 @@ CanvasState.prototype.overlap = function( myState ) {
                     myState.selection.x = elem.x - W;
                     myState.selection.y = elem.y;
                     console.log('to right');
-                    myState.draw();
                 }else if( (X - ( elem.x + elem.w )) <= megerSpace && (X - ( elem.x + elem.w )) >= 0 && Math.abs(Y - elem.y ) <= megerSpace ){
                     myState.selection.x = elem.x + elem.w;
                     myState.selection.y = elem.y;
@@ -188,11 +190,31 @@ CanvasState.prototype.overlap = function( myState ) {
                 }else if( elem.y - ( Y + H ) <= megerSpace && elem.y - ( Y + H ) >= 0 && Math.abs( X - elem.x ) <= megerSpace ){
                     myState.selection.x = elem.x;
                     myState.selection.y = elem.y - H;
-                    console.log('to bottom');
+                    console.log('to bottom to left');
+                }else if( elem.y - ( Y + H ) <= megerSpace && elem.y - ( Y + H ) >= 0 && Math.abs( ( X + W )- ( elem.x + elem.w ) ) <= megerSpace ){
+                    myState.selection.x = elem.x + ( elem.w - W );
+                    myState.selection.y = elem.y - H;
+                    console.log('to bottom to right');
                 }else if( Y - ( elem.y + elem.h ) <= megerSpace && Y - ( elem.y + elem.h ) >= 0 && Math.abs( X - elem.x ) <= megerSpace ){
                     myState.selection.x = elem.x;
                     myState.selection.y = elem.y + elem.h;
-                    console.log('to bottom');
+                    console.log('to top to left');
+                }else if( Y - ( elem.y + elem.h ) <= megerSpace && Y - ( elem.y + elem.h ) >= 0 && Math.abs( ( X + W )- ( elem.x + elem.w ) ) <= megerSpace ){
+                    myState.selection.x = elem.x + ( elem.w - W );
+                    myState.selection.y = elem.y + elem.h;
+                    console.log('to top to right');
+                }else if( Y - ( elem.y + elem.h ) <= megerSpace && Y - ( elem.y + elem.h ) >= 0 ){
+                    myState.selection.y = elem.y + elem.h;
+                    console.log('to top all');
+                }else if( elem.y - ( Y + H ) <= megerSpace && elem.y - ( Y + H ) >= 0 ){
+                    myState.selection.y = elem.y - H;
+                    console.log('to bottom all');
+                }else if( (X - ( elem.x + elem.w )) <= megerSpace && (X - ( elem.x + elem.w )) >= 0 ){
+                    myState.selection.x = elem.x + elem.w;
+                    console.log('to left all');
+                }else if( elem.x - (X + W) <= megerSpace && elem.x - (X + W) >= 0 ){
+                    myState.selection.x = elem.x - W;
+                    console.log('to right all');
                 }else{
                     elem.fill = '#AAAAAA';
                 }
