@@ -43,7 +43,6 @@ function CanvasState(canvas) {
     this.valid = false; // when set to false, the canvas will redraw everything
     this.polygons = [];  // the collection of things to be drawn
     this.dragging = false; // Keep track of when we are dragging
-    // the current selected object. In the future we could turn this into an array for multiple selection
     this.selection = null;
     this.dragoffx = 0;
     this.dragoffy = 0;
@@ -167,9 +166,6 @@ CanvasState.prototype.draw = function() {
         paths = [];
         for (var i = 0; i < polygons.length; i++) {
             var polygon = polygons[i];
-            // We can skip the drawing of elements that have moved off the screen:
-            /*if (shape.x > this.width || shape.y > this.height ||
-                shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;*/
             polygon.draw(ctx);
         }
 
