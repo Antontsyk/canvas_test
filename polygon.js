@@ -5,7 +5,6 @@ function Polygon(way, fill) {
     this.way = way;
     this.fill = fill || '#AAAAAA';
     this.id = countElem++;
-    this.returnValue = false;
 }
 
 Polygon.prototype.draw = function(ctx) {
@@ -63,13 +62,19 @@ function CanvasState(canvas) {
             var path = paths[i];
             if ( myState.ctx.isPointInPath(path, mx, my)) {
                 var pol = myState.polygons[ i ];
+                var startWay = myState.polygons[i].way.copyWithin();
                 myState.dragoffx = -mx;
                 myState.dragoffy = -my;
 
                 myState.dragging = true;
                 myState.selection = pol;
-                myState.startPosition = pol.way;
+                myState.startPosition = new Array();
 
+                for( var k = 0; k < startWay.length; k++ ){
+                    myState.startPosition[k] = new Array();
+                    myState.startPosition[k][0] = startWay[k][0];
+                    myState.startPosition[k][1] = startWay[k][1];
+                }
 
                 myState.valid = false;
                 break;
@@ -108,21 +113,24 @@ function CanvasState(canvas) {
                 });
             }
 
-
+            console.log( myState.startPosition )
             myState.valid = false; // Something's dragging so we must redraw
         }
     }, true);
     canvas.addEventListener('mouseup', function(e) {
-        console.log(myState.returnValue)
+
         if( myState.returnValue ){
-            console.log(myState.startPosition)
+            console.log( myState.startPosition )
             myState.selection.way = myState.startPosition;
             myState.selection.returnValue = false;
+            myState.polygons.map( function ( elem, i ) {
+                elem.fill = polygonsInit[i].fill;
+            });
             myState.valid = false;
         };
         myState.draw();
         myState.dragging = false;
-    }, true);
+    }, false);
 
     this.selectionColor = '#CC0000';
     this.selectionWidth = 2;
